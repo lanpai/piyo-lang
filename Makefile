@@ -18,15 +18,15 @@ output: main.o Interpreter.o Value.o
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) main.o Interpreter.o Value.o -o ../$(BUILD_DIR)/$(BINARY) $(LIB)
 
 main.o: main.cpp
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(OBJ_DIR)
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../main.cpp
 
 Interpreter.o: Interpreter.cpp
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(OBJ_DIR)
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Interpreter.cpp
 
 Value.o: Types/Value.cpp
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(OBJ_DIR)
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Types/Value.cpp
 
 run:

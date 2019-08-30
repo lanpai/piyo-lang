@@ -2,9 +2,6 @@ BINARY = piyo-lang
 
 CPP_STD=c++17
 
-OBJS_C =
-OBJS = main.o LangParser.o
-
 BUILD_DIR = build
 OBJ_DIR = obj
 
@@ -16,13 +13,21 @@ ifeq ($(OS),Windows_NT)
 	RUN_PREFIX = start
 endif
 
-output: $(OBJS_C) $(OBJS)
+output: main.o Interpreter.o Value.o
 	@mkdir -p $(BUILD_DIR)
-	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) $(OBJS) -o ../$(BUILD_DIR)/$(BINARY) $(LIB)
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) main.o Interpreter.o Value.o -o ../$(BUILD_DIR)/$(BINARY) $(LIB)
 
-$(OBJS): %.o: %.cpp
-	@mkdir -p $(OBJ_DIR)
-	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../$< $(LIB)
+main.o: main.cpp
+	@mkdir -p $(BUILD_DIR)
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../main.cpp
+
+Interpreter.o: Interpreter.cpp
+	@mkdir -p $(BUILD_DIR)
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Interpreter.cpp
+
+Value.o: Types/Value.cpp
+	@mkdir -p $(BUILD_DIR)
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Types/Value.cpp
 
 run:
 	$(RUN_PREFIX) $(BUILD_DIR)/$(BINARY)

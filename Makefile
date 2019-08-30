@@ -3,7 +3,7 @@ BINARY = piyo-lang
 CPP_STD=c++17
 
 OBJS_C =
-OBJS = main.o
+OBJS = main.o LangParser.o
 
 BUILD_DIR = build
 OBJ_DIR = obj

@@ -25,9 +25,9 @@ Interpreter.o: Interpreter.cpp
 	@mkdir -p $(OBJ_DIR)
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Interpreter.cpp
 
-Value.o: Standard/Value.cpp
+Value.o: Value.cpp
 	@mkdir -p $(OBJ_DIR)
-	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Standard/Value.cpp
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Value.cpp
 
 run:
 	$(RUN_PREFIX) $(BUILD_DIR)/$(BINARY)

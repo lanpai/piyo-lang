@@ -1,8 +1,5 @@
 #include "Value.h"
 
-#include <typeinfo>
-#include <cstdio>
-
 namespace pLang {
 
     template <>
@@ -29,28 +26,22 @@ namespace pLang {
         this->type = Type::STRING;
     }
 
-    template <class T>
+    template <typename T>
     const T &
     Value<T>::GetValue() const {
         return this->value;
     }
 
-    template <class T>
+    template <typename T>
     void
     Value<T>::SetValue(const T &value) {
         this->value = value;
     }
 
-    template <class T>
+    template <typename T>
     Type
     Value<T>::GetType() const {
         return this->type;
-    }
-    
-    template <>
-    Value<int>
-    Value<int>::operator+(const Value<int> &rhs) const {
-        return this->GetValue() + rhs.GetValue();
     }
 
     template class Value<int>;

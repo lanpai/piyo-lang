@@ -14,7 +14,7 @@ namespace pLang {
 
     class IValue {};
 
-    template <class T>
+    template <typename T>
     class Value : public IValue {
         public:
             Value(const T &value);
@@ -24,13 +24,59 @@ namespace pLang {
 
             Type GetType() const;
 
-            Value<T> operator+(const Value<int> &rhs) const;
+            // Operator overloads
+            template <typename R>
+            Value<T> operator+(const Value<R> &rhs) const;
+            template <typename R>
+            Value<T> operator-(const Value<R> &rhs) const;
+            template <typename R>
+            Value<T> operator*(const Value<R> &rhs) const;
+            template <typename R>
+            Value<T> operator/(const Value<R> &rhs) const;
 
         private:
             Type type;
 
             T value;
     };
+
+    // Operator overload definitions
+
+    template <typename T>
+    template <typename R>
+    Value<T>
+    Value<T>::operator+(const Value<R> &rhs) const {
+        return this->GetValue() + rhs.GetValue();
+    }
+
+    template <typename T>
+    template <typename R>
+    Value<T>
+    Value<T>::operator-(const Value<R> &rhs) const {
+        return this->GetValue() - rhs.GetValue();
+    }
+
+    template <typename T>
+    template <typename R>
+    Value<T>
+    Value<T>::operator*(const Value<R> &rhs) const {
+        return this->GetValue() * rhs.GetValue();
+    }
+
+    template <typename T>
+    template <typename R>
+    Value<T>
+    Value<T>::operator/(const Value<R> &rhs) const {
+        return this->GetValue() / rhs.GetValue();
+    }
+    
+    // String concatenation
+    template <>
+    template <typename R>
+    Value<std::string>
+    Value<std::string>::operator+(const Value<R> &rhs) const {
+        return this->GetValue() + std::to_string(rhs.GetValue());
+    }
 
 }
 

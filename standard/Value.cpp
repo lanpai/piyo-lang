@@ -3,7 +3,7 @@
 #include <typeinfo>
 #include <cstdio>
 
-namespace pLANG {
+namespace pLang {
 
     template <>
     Value<int>::Value(const int &value) {
@@ -46,7 +46,7 @@ namespace pLANG {
     Value<T>::GetType() const {
         return this->type;
     }
-
+    
     template <>
     Value<int>
     Value<int>::operator+(const Value<int> &rhs) const {

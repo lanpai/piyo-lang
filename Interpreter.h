@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace pLANG {
+namespace pLang {
 
     class Interpreter {
         public:

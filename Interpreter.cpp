@@ -1,6 +1,6 @@
 #include "Interpreter.h"
 
-namespace pLANG {
+namespace pLang {
 
     Interpreter::Interpreter() {
 

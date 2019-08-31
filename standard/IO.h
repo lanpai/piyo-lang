@@ -3,7 +3,7 @@
 
 #include "Value.h"
 
-namespace pLANG {
+namespace pLang {
 
     void print(IValue *value) {
         switch (value->)

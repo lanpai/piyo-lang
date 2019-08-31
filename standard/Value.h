@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace pLANG {
+namespace pLang {
 
     enum class Type {
         INT,

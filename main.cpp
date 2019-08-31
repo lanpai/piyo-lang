@@ -5,12 +5,12 @@
 
 #include "Standard/Value.h"
 
-int main(int argc, char** argv) {
-    std::vector<pLANG::IValue *> test;
+using namespace pLang;
 
-    pLANG::Value<int> a(5);
-    pLANG::Value<int> b(6);
-    pLANG::Value<int> c = a + b;
+int main(int argc, char** argv) {
+    Value<int> a(5);
+    Value<int> b(6);
+    Value<int> c = a + b;
     std::printf("%d\n", c.GetValue());
 
     return 0;

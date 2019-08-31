@@ -2,6 +2,7 @@
 #define __VALUE_H
 
 #include <string>
+#include <variant>
 
 namespace pLang {
 
@@ -12,71 +13,38 @@ namespace pLang {
         STRING
     };
 
-    class IValue {};
-
-    template <typename T>
-    class Value : public IValue {
+    class Value {
         public:
-            Value(const T &value);
+            // Constructors
+            Value(const int &value);
+            Value(const float &value);
+            Value(const double &value);
+            Value(const std::string &value);
 
-            const T &GetValue() const;
-            void SetValue(const T &value);
-
+            // Getters
+            int GetInt() const;
+            float GetFloat() const;
+            double GetDouble() const;
+            std::string GetString() const;
             Type GetType() const;
 
+            // Setters
+            void SetValue(const int &value);
+            void SetValue(const float &value);
+            void SetValue(const double &value);
+            void SetValue(const std::string &value);
+
             // Operator overloads
-            template <typename R>
-            Value<T> operator+(const Value<R> &rhs) const;
-            template <typename R>
-            Value<T> operator-(const Value<R> &rhs) const;
-            template <typename R>
-            Value<T> operator*(const Value<R> &rhs) const;
-            template <typename R>
-            Value<T> operator/(const Value<R> &rhs) const;
+            Value operator+(const Value &rhs) const;
+            Value operator-(const Value &rhs) const;
+            Value operator*(const Value &rhs) const;
+            Value operator/(const Value &rhs) const;
 
         private:
             Type type;
 
-            T value;
+            std::variant<int, float, double, std::string> value;
     };
-
-    // Operator overload definitions
-
-    template <typename T>
-    template <typename R>
-    Value<T>
-    Value<T>::operator+(const Value<R> &rhs) const {
-        return this->GetValue() + rhs.GetValue();
-    }
-
-    template <typename T>
-    template <typename R>
-    Value<T>
-    Value<T>::operator-(const Value<R> &rhs) const {
-        return this->GetValue() - rhs.GetValue();
-    }
-
-    template <typename T>
-    template <typename R>
-    Value<T>
-    Value<T>::operator*(const Value<R> &rhs) const {
-        return this->GetValue() * rhs.GetValue();
-    }
-
-    template <typename T>
-    template <typename R>
-    Value<T>
-    Value<T>::operator/(const Value<R> &rhs) const {
-        return this->GetValue() / rhs.GetValue();
-    }
-    
-    // String concatenation
-    template <>
-    template <typename R>
-    Value<std::string>
-    Value<std::string>::operator+(const Value<R> &rhs) const {
-        return this->GetValue() + std::to_string(rhs.GetValue());
-    }
 
 }
 

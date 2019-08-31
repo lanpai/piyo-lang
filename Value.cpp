@@ -36,7 +36,7 @@ namespace pLang {
             case Type::DOUBLE:
                 return (int)std::get<double>(this->value);
             case Type::STRING:
-                throw std::invalid_argument("can not convert type int into type string");
+                throw std::logic_error("can not convert type string into type int");
         }
     }
     float
@@ -49,7 +49,7 @@ namespace pLang {
             case Type::DOUBLE:
                 return (float)std::get<double>(this->value);
             case Type::STRING:
-                throw std::invalid_argument("can not convert type float into type string");
+                throw std::logic_error("can not convert type string into type float");
         }
     }
     double
@@ -62,7 +62,7 @@ namespace pLang {
             case Type::DOUBLE:
                 return std::get<double>(this->value);
             case Type::STRING:
-                throw std::invalid_argument("can not convert type double into type string");
+                throw std::logic_error("can not convert type string into type double");
         }
     }
     std::string
@@ -86,19 +86,42 @@ namespace pLang {
     // Setters
     void
     Value::SetValue(const int &value) {
+        if (this->type != Type::INT)
+            throw std::logic_error("type mismatch between variable and new value");
         this->value = value;
     }
     void
     Value::SetValue(const float &value) {
+        if (this->type != Type::FLOAT)
+            throw std::logic_error("type mismatch between variable and new value");
         this->value = value;
     }
     void
     Value::SetValue(const double &value) {
+        if (this->type != Type::DOUBLE)
+            throw std::logic_error("type mismatch between variable and new value");
         this->value = value;
     }
     void
     Value::SetValue(const std::string &value) {
+        if (this->type != Type::STRING)
+            throw std::logic_error("type mismatch between variable and new value");
         this->value = value;
+    }
+    void
+    Value::SetValue(const Value &value) {
+        if (this->type != value.GetType())
+            throw std::logic_error("type mismatch between variable and new value");
+        switch (value.GetType()) {
+            case Type::INT:
+                this->value = value.GetInt();
+            case Type::FLOAT:
+                this->value = value.GetFloat();
+            case Type::DOUBLE:
+                this->value = value.GetDouble();
+            case Type::STRING:
+                this->value = value.GetString();
+        }
     }
 
     // Operator overloads
@@ -150,6 +173,174 @@ namespace pLang {
                         return this->GetString() + rhs.GetString();
                 }
         }
+    }
+    Value
+    Value::operator-(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() - rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() - rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() - rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type int and type string");
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() - rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() - rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() - rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type float and type string");
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() - rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() - rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() - rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type double and type string");
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::INT:
+                        throw std::logic_error("can not perform operator - between type string and type int");
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator - between type string and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator - between type string and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type string and type string");
+                }
+        }
+    }
+    Value
+    Value::operator*(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() * rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() * rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() * rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type int and type string");
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() * rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() * rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() * rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type float and type string");
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() * rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() * rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() * rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type double and type string");
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::INT:
+                        throw std::logic_error("can not perform operator - between type string and type int");
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator - between type string and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator - between type string and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type string and type string");
+                }
+        }
+    }
+    Value
+    Value::operator/(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() / rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() / rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() / rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type int and type string");
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() / rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() / rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() / rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type float and type string");
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() / rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() / rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() / rhs.GetDouble();
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type double and type string");
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::INT:
+                        throw std::logic_error("can not perform operator - between type string and type int");
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator - between type string and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator - between type string and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator - between type string and type string");
+                }
+        }
+    }
+
+    Value
+    Value::operator+=(const Value &rhs) {
+        *this = *this + rhs;
+        return *this;
+    }
+    Value
+    Value::operator-=(const Value &rhs) {
+        *this = *this - rhs;
+        return *this;
+    }
+    Value
+    Value::operator*=(const Value &rhs) {
+        *this = *this * rhs;
+        return *this;
+    }
+    Value
+    Value::operator/=(const Value &rhs) {
+        *this = *this / rhs;
+        return *this;
     }
 
 }

@@ -33,12 +33,18 @@ namespace pLang {
             void SetValue(const float &value);
             void SetValue(const double &value);
             void SetValue(const std::string &value);
+            void SetValue(const Value &value);
 
             // Operator overloads
             Value operator+(const Value &rhs) const;
             Value operator-(const Value &rhs) const;
             Value operator*(const Value &rhs) const;
             Value operator/(const Value &rhs) const;
+
+            Value operator+=(const Value &rhs);
+            Value operator-=(const Value &rhs);
+            Value operator*=(const Value &rhs);
+            Value operator/=(const Value &rhs);
 
         private:
             Type type;

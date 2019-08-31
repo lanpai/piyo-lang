@@ -8,8 +8,10 @@
 using namespace pLang;
 
 int main(int argc, char** argv) {
-    Value a("test");
-    std::printf("%d\n", a.GetInt());
+    Value a(10);
+    Value b("test");
+    b += a;
+    std::printf("%s\n", b.GetString().c_str());
 
     return 0;
 }

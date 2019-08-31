@@ -17,12 +17,14 @@ namespace pLANG {
     template <class T>
     class Value : public IValue {
         public:
-            Value(Type type, T value);
+            Value(const T &value);
 
-            T GetValue();
-            void SetValue(T value);
+            const T &GetValue() const;
+            void SetValue(const T &value);
 
-            Value<int> operator+(Value<int> rhs) { return this->GetValue() + rhs.GetValue(); }
+            Type GetType() const;
+
+            Value<T> operator+(const Value<int> &rhs) const;
 
         private:
             Type type;

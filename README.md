@@ -14,7 +14,7 @@ piyo language interpreter
 
 ## 🚧 Roadmap
 - v. **alpha**
-  - [ ] scope
+  - [x] scope
   - [ ] standard library
     - [ ] print
   - [ ] for

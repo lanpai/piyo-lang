@@ -36,7 +36,12 @@ namespace pLang {
             case Type::DOUBLE:
                 return (int)std::get<double>(this->value);
             case Type::STRING:
-                throw std::logic_error("can not convert type string into type int");
+                try {
+                    return std::stoi(std::get<std::string>(this->value));
+                }
+                catch (const std::exception &e) {
+                    throw std::logic_error("can not convert type string into type double");
+                }
         }
     }
     float
@@ -49,7 +54,12 @@ namespace pLang {
             case Type::DOUBLE:
                 return (float)std::get<double>(this->value);
             case Type::STRING:
-                throw std::logic_error("can not convert type string into type float");
+                try {
+                    return std::stof(std::get<std::string>(this->value));
+                }
+                catch (const std::exception &e) {
+                    throw std::logic_error("can not convert type string into type double");
+                }
         }
     }
     double
@@ -62,7 +72,12 @@ namespace pLang {
             case Type::DOUBLE:
                 return std::get<double>(this->value);
             case Type::STRING:
-                throw std::logic_error("can not convert type string into type double");
+                try {
+                    return std::stod(std::get<std::string>(this->value));
+                }
+                catch (const std::exception &e) {
+                    throw std::logic_error("can not convert type string into type double");
+                }
         }
     }
     std::string
@@ -121,6 +136,25 @@ namespace pLang {
                 this->value = value.GetDouble();
             case Type::STRING:
                 this->value = value.GetString();
+        }
+    }
+
+    // Cast
+    Value
+    Value::CastValue(Type type) const {
+        switch (this->type) {
+            case Type::INT:
+                return Value(this->GetInt());
+                break;
+            case Type::FLOAT:
+                return Value(this->GetFloat());
+                break;
+            case Type::DOUBLE:
+                return Value(this->GetDouble());
+                break;
+            case Type::STRING:
+                return Value(this->GetString());
+                break;
         }
     }
 

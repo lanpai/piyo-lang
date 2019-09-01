@@ -1,3 +1,4 @@
-string test;
-test = "testing";
+string test = 5;
+print(test);
+test = 10; // testing comments
 print(test);

@@ -35,6 +35,9 @@ namespace pLang {
             void SetValue(const std::string &value);
             void SetValue(const Value &value);
 
+            // Cast
+            Value CastValue(Type type) const;
+
             // Operator overloads
             Value operator+(const Value &rhs) const;
             Value operator-(const Value &rhs) const;

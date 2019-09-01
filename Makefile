@@ -13,9 +13,9 @@ ifeq ($(OS),Windows_NT)
 	RUN_PREFIX = start
 endif
 
-output: main.o Interpreter.o Value.o
+output: main.o Interpreter.o Value.o Scope.o
 	@mkdir -p $(BUILD_DIR)
-	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) main.o Interpreter.o Value.o -o ../$(BUILD_DIR)/$(BINARY) $(LIB)
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) main.o Interpreter.o Value.o Scope.o -o ../$(BUILD_DIR)/$(BINARY) $(LIB)
 
 main.o: main.cpp
 	@mkdir -p $(OBJ_DIR)
@@ -28,6 +28,10 @@ Interpreter.o: Interpreter.cpp
 Value.o: Value.cpp
 	@mkdir -p $(OBJ_DIR)
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Value.cpp
+
+Scope.o: Scope.cpp
+	@mkdir -p $(OBJ_DIR)
+	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Scope.cpp
 
 run:
 	$(RUN_PREFIX) $(BUILD_DIR)/$(BINARY)

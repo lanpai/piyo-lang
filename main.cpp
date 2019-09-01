@@ -1,17 +1,19 @@
 #include "Interpreter.h"
 
-#include <vector>
 #include <string>
+#include <fstream>
 
-#include "Value.h"
+#include "Interpreter.h"
 
 using namespace pLang;
 
 int main(int argc, char** argv) {
-    Value a(10);
-    Value b("test");
-    b += a;
-    std::printf("%s\n", b.GetString().c_str());
+    std::ifstream fs("test.piyo");
+    std::string content((std::istreambuf_iterator<char>(fs)),
+                       (std::istreambuf_iterator<char>()));
+
+    Interpreter pLang;
+    pLang.Parse(content);
 
     return 0;
 }

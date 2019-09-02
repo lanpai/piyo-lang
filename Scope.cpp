@@ -2,7 +2,7 @@
 
 #include <stdexcept>
 
-#include "config.def.h"
+#include "Definitions"
 
 namespace pLang {
 

@@ -1,4 +1,11 @@
-string test = 5;
+int a = 5;
+int b;
+b = a + 1;
+print(a);
+print(b);
+
+string test = "a" + "b" + 5;
 print(test);
-test = 10; // testing comments
-print(test);
+
+int mod = 5 % 3;
+print(mod);

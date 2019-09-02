@@ -23,6 +23,10 @@ namespace pLang {
         this->type = Type::STRING;
         this->value = value;
     }
+    Value::Value(const Value &value) {
+        this->type = value.type;
+        this->value = value.value;
+    }
 
     // Getters
 
@@ -40,7 +44,7 @@ namespace pLang {
                     return std::stoi(std::get<std::string>(this->value));
                 }
                 catch (const std::exception &e) {
-                    throw std::logic_error("can not convert type string into type double");
+                    throw std::logic_error("can not convert type string into type int");
                 }
         }
     }
@@ -58,7 +62,7 @@ namespace pLang {
                     return std::stof(std::get<std::string>(this->value));
                 }
                 catch (const std::exception &e) {
-                    throw std::logic_error("can not convert type string into type double");
+                    throw std::logic_error("can not convert type string into type float");
                 }
         }
     }
@@ -101,41 +105,75 @@ namespace pLang {
     // Setters
     void
     Value::SetValue(const int &value) {
-        if (this->type != Type::INT)
-            throw std::logic_error("type mismatch between variable and new value");
-        this->value = value;
+        switch (this->type) {
+            case Type::INT:
+            case Type::FLOAT:
+            case Type::DOUBLE:
+                this->value = value;
+                break;
+            case Type::STRING:
+                this->value = std::to_string(value);
+                break;
+        }
     }
     void
     Value::SetValue(const float &value) {
-        if (this->type != Type::FLOAT)
-            throw std::logic_error("type mismatch between variable and new value");
-        this->value = value;
+        switch (this->type) {
+            case Type::INT:
+            case Type::FLOAT:
+            case Type::DOUBLE:
+                this->value = value;
+                break;
+            case Type::STRING:
+                this->value = std::to_string(value);
+                break;
+        }
     }
     void
     Value::SetValue(const double &value) {
-        if (this->type != Type::DOUBLE)
-            throw std::logic_error("type mismatch between variable and new value");
-        this->value = value;
+        switch (this->type) {
+            case Type::INT:
+            case Type::FLOAT:
+            case Type::DOUBLE:
+                this->value = value;
+                break;
+            case Type::STRING:
+                this->value = std::to_string(value);
+                break;
+        }
     }
     void
     Value::SetValue(const std::string &value) {
-        if (this->type != Type::STRING)
-            throw std::logic_error("type mismatch between variable and new value");
-        this->value = value;
+        switch (this->type) {
+            case Type::INT:
+                throw std::logic_error("can not convert type string into type int");
+                break;
+            case Type::FLOAT:
+                throw std::logic_error("can not convert type string into type float");
+                break;
+            case Type::DOUBLE:
+                throw std::logic_error("can not convert type string into type double");
+                break;
+            case Type::STRING:
+                this->value = value;
+                break;
+        }
     }
     void
     Value::SetValue(const Value &value) {
-        if (this->type != value.GetType())
-            throw std::logic_error("type mismatch between variable and new value");
         switch (value.GetType()) {
             case Type::INT:
                 this->value = value.GetInt();
+                break;
             case Type::FLOAT:
                 this->value = value.GetFloat();
+                break;
             case Type::DOUBLE:
                 this->value = value.GetDouble();
+                break;
             case Type::STRING:
                 this->value = value.GetString();
+                break;
         }
     }
 
@@ -355,6 +393,55 @@ namespace pLang {
                 }
         }
     }
+    Value
+    Value::operator%(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() % rhs.GetInt();
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator % between type int and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator % between type int and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator % between type int and type string");
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        throw std::logic_error("can not perform operator % between type float and type int");
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator % between type float and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator % between type float and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator % between type float and type string");
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        throw std::logic_error("can not perform operator % between type double and type int");
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator % between type double and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator % between type double and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator % between type double and type string");
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::INT:
+                        throw std::logic_error("can not perform operator % between type string and type int");
+                    case Type::FLOAT:
+                        throw std::logic_error("can not perform operator % between type string and type float");
+                    case Type::DOUBLE:
+                        throw std::logic_error("can not perform operator % between type string and type double");
+                    case Type::STRING:
+                        throw std::logic_error("can not perform operator % between type string and type string");
+                }
+        }
+    }
 
     Value
     Value::operator+=(const Value &rhs) {
@@ -374,6 +461,11 @@ namespace pLang {
     Value
     Value::operator/=(const Value &rhs) {
         *this = *this / rhs;
+        return *this;
+    }
+    Value
+    Value::operator%=(const Value &rhs) {
+        *this = *this % rhs;
         return *this;
     }
 

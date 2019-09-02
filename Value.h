@@ -20,6 +20,7 @@ namespace pLang {
             Value(const float &value);
             Value(const double &value);
             Value(const std::string &value);
+            Value(const Value &value);
 
             // Getters
             int GetInt() const;
@@ -43,11 +44,13 @@ namespace pLang {
             Value operator-(const Value &rhs) const;
             Value operator*(const Value &rhs) const;
             Value operator/(const Value &rhs) const;
+            Value operator%(const Value &rhs) const;
 
             Value operator+=(const Value &rhs);
             Value operator-=(const Value &rhs);
             Value operator*=(const Value &rhs);
             Value operator/=(const Value &rhs);
+            Value operator%=(const Value &rhs);
 
         private:
             Type type;

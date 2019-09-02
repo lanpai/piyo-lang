@@ -7,6 +7,7 @@
 namespace pLang {
 
     std::map<std::string, TokenType> TOKEN_IDENTIFIER = {
+        // INT, FLOAT, DOUBLE, STRING handled in ParseMiscToken()
         {   "int",      TokenType::TYPE         },
         {   "float",    TokenType::TYPE         },
         {   "double",   TokenType::TYPE         },
@@ -16,10 +17,12 @@ namespace pLang {
         {   "-",        TokenType::SUB          },
         {   "*",        TokenType::MULT         },
         {   "/",        TokenType::DIV          },
+        {   "%",        TokenType::MOD          },
         {   "+=",       TokenType::ADD_EQUAL    },
         {   "-=",       TokenType::SUB_EQUAL    },
         {   "*=",       TokenType::MULT_EQUAL   },
         {   "/=",       TokenType::DIV_EQUAL    },
+        {   "%=",       TokenType::MOD_EQUAL    },
         {   "\"",       TokenType::WRAPPER      },
         {   "(",        TokenType::WRAPPER      },
         {   ")",        TokenType::WRAPPER      },
@@ -33,12 +36,16 @@ namespace pLang {
         {   "string",   Type::STRING            }
     };
 
+    std::map<char, char> WRAPPER_MATCH = {
+        { '(', ')' }
+    };
+
     Interpreter::Interpreter() {
 
     }
-
+    
     void
-    PushToken(std::string &token, std::vector<Token> &tokens) {
+    ParseMiscToken(std::string &token, std::vector<Token> &tokens) {
         if (token.length() > 0) {
             switch (TOKEN_IDENTIFIER[token]) {
                 // Handle types
@@ -52,10 +59,12 @@ namespace pLang {
                 case TokenType::SUB:
                 case TokenType::MULT:
                 case TokenType::DIV:
+                case TokenType::MOD:
                 case TokenType::ADD_EQUAL:
                 case TokenType::SUB_EQUAL:
                 case TokenType::MULT_EQUAL:
                 case TokenType::DIV_EQUAL:
+                case TokenType::MOD_EQUAL:
                     tokens.push_back(Token(TOKEN_IDENTIFIER[token], token));
                     break;
 
@@ -70,8 +79,9 @@ namespace pLang {
                     else if (std::regex_match(token, std::regex("^[0-9]+\\.[0-9]+$")))
                         tokens.push_back(Token(TokenType::DOUBLE, token));
                     // Check if identififer (alphabetic + _)
-                    else if (std::regex_match(token, std::regex("^[a-zA-Z_]*$")))
+                    else if (std::regex_match(token, std::regex("^[a-zA-Z_]*$"))) {
                         tokens.push_back(Token(TokenType::IDENTIFIER, token));
+                    }
                     else
                         throw std::logic_error("invalid token '" + token + "'");
                     break;
@@ -94,7 +104,7 @@ namespace pLang {
 
         // Wrapper counter
         std::vector<char> wrapperStack;
-    
+
         enum class ReadState {
             DEFAULT,
             LINE_COMMENT,
@@ -102,12 +112,12 @@ namespace pLang {
             STRING
         } currState = ReadState::DEFAULT;
 
-        // Read single characters
+        // Iterate by character
         int i = 0;
         while (ss.get(c)) {
             // Check current state
             switch (currState) {
-                // Disable LINE_COMMENT state on end line
+                // Disable LINE_COMMENT state on line break
                 case ReadState::LINE_COMMENT:
                     if (c == '\n') currState = ReadState::DEFAULT;
                     break;
@@ -117,7 +127,7 @@ namespace pLang {
                     if (c == '/' && content[i - 1] == '*') currState = ReadState::DEFAULT;
                     break;
 
-                // Continue reading to token, disable STRING on un-escaped "
+                // Continue reading to token, disable STRING state on un-escaped *
                 case ReadState::STRING:
                     if (c == '"' && content[i - 1] != '\\') {
                         currState = ReadState::DEFAULT;
@@ -133,22 +143,28 @@ namespace pLang {
                     // Check current character
                     switch (c) {
                         case '/':
-                            PushToken(currToken, tokens);
+                            ParseMiscToken(currToken, tokens);
 
-                            // Enable LINE_COMMENT on //
-                            if (content.length() - 1 > i && content[i + 1] == '/')
+                            // Enable LINE_COMMENT state on //
+                            if (content.length() - 1 > i && content[i + 1] == '/') {
                                 currState = ReadState::LINE_COMMENT;
+                                ss.get(c);
+                                i += 1;
                                 break;
+                            }
 
-                            // Enable BLOCK_COMMENT on /*
-                            if (content.length() - 1 > i && content[i + 1] == '*')
+                            // Enable BLOCK_COMMENT state on /*
+                            if (content.length() - 1 > i && content[i + 1] == '*') {
                                 currState = ReadState::BLOCK_COMMENT;
+                                ss.get(c);
+                                i += 1;
                                 break;
+                            }
 
                             break;
 
                         case '"':
-                            PushToken(currToken, tokens);
+                            ParseMiscToken(currToken, tokens);
 
                             // Enable STRING on "
                             currState = ReadState::STRING;
@@ -157,34 +173,34 @@ namespace pLang {
 
                         // Wrapper logic
                         case '(':
-                            PushToken(currToken, tokens);
-                            tokens.push_back(Token(TokenType::WRAPPER, "("));
-                            wrapperStack.push_back('(');
+                            ParseMiscToken(currToken, tokens);
+                            tokens.push_back(Token(TokenType::WRAPPER, std::string(1, c)));
+                            wrapperStack.push_back(c);
                             break;
 
                         case ')':
-                            if (wrapperStack.back() == '(') {
-                                PushToken(currToken, tokens);
-                                tokens.push_back(Token(TokenType::WRAPPER, ")"));
+                            if (WRAPPER_MATCH[wrapperStack.back()] == c) {
+                                ParseMiscToken(currToken, tokens);
+                                tokens.push_back(Token(TokenType::WRAPPER, std::string(1, c)));
                                 wrapperStack.pop_back();
                             }
                             else if (wrapperStack.size() == 0)
-                                throw std::logic_error("extraneous ')'");
+                                throw std::logic_error("extraneous '" + std::string(1, c) + "'");
                             else
-                                throw std::logic_error("expected '" + std::string(1, wrapperStack.back()) + "' but got ')'");
-                            break;
+                                throw std::logic_error("expected '" + std::string(1, WRAPPER_MATCH[wrapperStack.back()]) +  "' but got '" + std::string(1, c) + "'");
 
                         case ' ':
                         case '\n':
-                            PushToken(currToken, tokens);
+                            ParseMiscToken(currToken, tokens);
                             break;
 
                         case ';':
-                            PushToken(currToken, tokens);
+                            ParseMiscToken(currToken, tokens);
 
-                            this->ParseLine(tokens, global);
-
-                            tokens.clear();
+                            if (tokens.size() > 0) {
+                                this->ParseLine(tokens, global);
+                                tokens.clear();
+                            }
 
                             break;
 
@@ -192,93 +208,156 @@ namespace pLang {
                             currToken += c;
                             break;
                     }
-                    break;
             }
             i++;
         }
+
+        if (currToken.length() > 0)
+            throw std::logic_error("expected ';'");
     }
 
     void
-    Interpreter::ParseLine(const std::vector<Token> &tokens, Scope &scope) {
-        std::printf("\033[1m\033[33mparsing line:\033[0m ");
+    Interpreter::ParseLine(std::vector<Token> &tokens, Scope &scope) {
+        // Precedence
+        
+        int operators = 0;
 
-        std::vector<TokenType> types;
-        for (Token token : tokens)
-            std::printf("%s ", token.value.c_str());
-        std::printf("\n");
+        // Variable declarations
+        if (tokens[0].type == TokenType::TYPE) {
+            if (tokens[1].type != TokenType::IDENTIFIER)
+                throw std::logic_error("expected identifier after type");
 
+            switch (TO_TYPE[tokens[0].token]) {
+                case Type::INT:
+                    scope.AddVariable(tokens[1].token, Value((int)0));
+                    tokens.erase(tokens.begin());
+                    break;
+                case Type::FLOAT:
+                    scope.AddVariable(tokens[1].token, Value((float)0.0f));
+                    tokens.erase(tokens.begin());
+                    break;
+                case Type::DOUBLE:
+                    scope.AddVariable(tokens[1].token, Value((double)0.0));
+                    tokens.erase(tokens.begin());
+                    break;
+                case Type::STRING:
+                    scope.AddVariable(tokens[1].token, Value((std::string)""));
+                    tokens.erase(tokens.begin());
+                    break;
+            }
+        }
+
+        // Prefix-++/--
+
+        // Function calls / Array subscript / Member access
         for (int i = 0; i < tokens.size(); i++) {
-            std::printf("   \033[1m\033[30mparsing:\033[0m %s [%d]\n", tokens[i].value.c_str(), (int)tokens[i].type);
-            types.push_back(tokens[i].type);
+            if (tokens[i].token == "print") {
+                std::printf("%s\n", tokens[i + 2].GetValue(&scope).GetString().c_str());
+                tokens.clear();
+            }
+        }
+        
+        // !
+
+        // * / %
+        for (int i = 0; i < tokens.size(); i++) {
             switch (tokens[i].type) {
-                case TokenType::IDENTIFIER:
-                    if (tokens[i].value == "print") {
-                        std::printf("       %s\n", scope.GetVariable(tokens[i + 2].value).GetString().c_str());
-                    }
+                case TokenType::MULT:
+                case TokenType::DIV:
+                case TokenType::MOD:
+                    if (i == 0)
+                        throw std::logic_error("expected token before operator");
+                    if (tokens.size() - 1 <= i)
+                        throw std::logic_error("expected token after operator");
+
+                    tokens[i - 1] = this->HandleOperator(tokens[i].type, tokens[i - 1], tokens[i + 1], scope);
+                    tokens.erase(tokens.begin() + i, tokens.begin() + i + 2);
+
+                    i--;
                     break;
-
-                case TokenType::TYPE:
-                    // Check if variable declaration
-                    if (tokens.size() - 1 > i && tokens[i + 1].type == TokenType::IDENTIFIER) {
-                        std::printf("created new variable %s\n", tokens[i + 1].value.c_str());
-
-                        switch (TO_TYPE[tokens[i].value]) {
-                            case Type::INT:
-                                scope.AddVariable(tokens[i + 1].value, Value(0));
-                                break;
-                            case Type::FLOAT:
-                                scope.AddVariable(tokens[i + 1].value, Value(0.0f));
-                                break;
-                            case Type::DOUBLE:
-                                scope.AddVariable(tokens[i + 1].value, Value(0.0));
-                                break;
-                            case Type::STRING:
-                                scope.AddVariable(tokens[i + 1].value, Value(""));
-                                break;
-                        }
-                        i++;
-                    }
-                    else {
-                        throw std::logic_error("expected identifier after type");
-                    }
-                    break;
-
-                // Check if EQUAL operator
-                case TokenType::EQUAL:
-                    if (i > 0 && tokens.size() - 1 > i && tokens[i - 1].type == TokenType::IDENTIFIER) {
-                        std::printf("changing variable %s\n", tokens[i - 1].value.c_str());
-                        switch (tokens[i + 1].type) {
-                            case TokenType::INT:
-                                scope.GetVariable(tokens[i - 1].value) = std::stoi(tokens[i + 1].value);
-                                i++;
-                                break;
-                            case TokenType::FLOAT:
-                                scope.GetVariable(tokens[i - 1].value) = std::stof(tokens[i + 1].value);
-                                i++;
-                                break;
-                            case TokenType::DOUBLE:
-                                scope.GetVariable(tokens[i - 1].value) = std::stod(tokens[i + 1].value);
-                                i++;
-                                break;
-                            case TokenType::STRING:
-                                scope.GetVariable(tokens[i - 1].value) = tokens[i + 1].value;
-                                i++;
-                                break;
-                            default:
-                                throw std::logic_error("expected value after type");
-                        }
-                    }
-                    break;
-
                 default:
                     break;
             }
         }
+
+        // + -
+        for (int i = 0; i < tokens.size(); i++) {
+            switch (tokens[i].type) {
+                case TokenType::ADD:
+                case TokenType::SUB:
+                    if (i == 0)
+                        throw std::logic_error("expected token before operator");
+                    if (tokens.size() - 1 <= i)
+                        throw std::logic_error("expected token after operator");
+
+                    tokens[i - 1] = this->HandleOperator(tokens[i].type, tokens[i - 1], tokens[i + 1], scope);
+                    tokens.erase(tokens.begin() + i, tokens.begin() + i + 2);
+
+                    i--;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // > < >= <=
+
+        // == !=
+        operators = 0;
+
+        // = += -= *= /= %=
+        for (int i = tokens.size() - 1; i >= 0; i--) {
+            switch (tokens[i].type) {
+                case TokenType::EQUAL:
+                case TokenType::ADD_EQUAL:
+                case TokenType::SUB_EQUAL:
+                case TokenType::MULT_EQUAL:
+                case TokenType::DIV_EQUAL:
+                case TokenType::MOD_EQUAL:
+                    if (i == 0)
+                        throw std::logic_error("expected token before operator");
+                    if (tokens.size() - 1 <= i)
+                        throw std::logic_error("expected token after operator");
+
+                    tokens[i - 1] = this->HandleOperator(tokens[i].type, tokens[i - 1], tokens[i + 1], scope);
+                    tokens.erase(tokens.begin() + i, tokens.begin() + i + 2);
+
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        // Suffix-++/--
     }
 
-    /*Value
-    Interpreter::ParseValue(const std::vector<Token> &tokens) {
-        return Value("test");
-    }*/
+    Token
+    Interpreter::HandleOperator(TokenType oper, Token &lhs, Token &rhs, Scope &scope) {
+        switch (oper) {
+            case TokenType::EQUAL:
+                if (lhs.type != TokenType::IDENTIFIER)
+                    throw std::logic_error("expected left hand side of operator '=' to be an identifier");
+                lhs.GetValue(&scope).SetValue(rhs.GetValue(&scope));
+                return lhs;
+
+            case TokenType::ADD:
+                return Token(lhs.GetValue(&scope) + rhs.GetValue(&scope));
+
+            case TokenType::SUB:
+                return Token(lhs.GetValue(&scope) - rhs.GetValue(&scope));
+
+            case TokenType::MULT:
+                return Token(lhs.GetValue(&scope) * rhs.GetValue(&scope));
+
+            case TokenType::DIV:
+                return Token(lhs.GetValue(&scope) / rhs.GetValue(&scope));
+
+            case TokenType::MOD:
+                return Token(lhs.GetValue(&scope) % rhs.GetValue(&scope));
+
+            default:
+                throw std::logic_error("illegal operator");
+        }
+    }
 
 }

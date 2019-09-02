@@ -10,16 +10,18 @@ namespace pLang {
         INT,
         FLOAT,
         DOUBLE,
-        STRING
+        STRING,
+        BOOL
     };
 
     class Value {
         public:
             // Constructors
-            Value(const int &value);
-            Value(const float &value);
+            Value(int value);
+            Value(float value);
             Value(const double &value);
             Value(const std::string &value);
+            Value(bool value);
             Value(const Value &value);
 
             // Getters
@@ -27,6 +29,7 @@ namespace pLang {
             float GetFloat() const;
             double GetDouble() const;
             std::string GetString() const;
+            bool GetBool() const;
             Type GetType() const;
 
             // Setters
@@ -55,7 +58,7 @@ namespace pLang {
         private:
             Type type;
 
-            std::variant<int, float, double, std::string> value;
+            std::variant<int, float, double, std::string, bool> value;
     };
 
 }

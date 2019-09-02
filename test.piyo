@@ -9,3 +9,6 @@ print(test);
 
 int mod = 5 % 3;
 print(mod);
+
+bool boolean = false + false;
+print(boolean);

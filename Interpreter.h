@@ -19,6 +19,7 @@ namespace pLang {
         FLOAT,
         DOUBLE,
         STRING,
+        BOOL,
 
         // OPERATORS
         EQUAL,
@@ -55,23 +56,29 @@ namespace pLang {
                 case TokenType::STRING:
                     this->value = new Value((std::string)value);
                     break;
+                case TokenType::BOOL:
+                    if (value == "true")
+                        this->value = new Value(true);
+                    else
+                        this->value = new Value(false);
+                    break;
                 default:
                     this->value = nullptr;
                     break;
             }
         }
         Token(int value) {
-            this->type = TokenType::STRING;
+            this->type = TokenType::INT;
             this->token = std::to_string(value);
             this->value = new Value((int)value);
         }
         Token(float value) {
-            this->type = TokenType::STRING;
+            this->type = TokenType::FLOAT;
             this->token = std::to_string(value);
             this->value = new Value((float)value);
         }
-        Token(double value) {
-            this->type = TokenType::STRING;
+        Token(const double &value) {
+            this->type = TokenType::DOUBLE;
             this->token = std::to_string(value);
             this->value = new Value((double)value);
         }
@@ -79,6 +86,11 @@ namespace pLang {
             this->type = TokenType::STRING;
             this->token = value;
             this->value = new Value((std::string)value);
+        }
+        Token(bool value) {
+            this->type = TokenType::BOOL;
+            this->token = value;
+            this->value = new Value((bool)value);
         }
         Token(Value value) {
             switch (value.GetType()) {
@@ -93,6 +105,9 @@ namespace pLang {
                     break;
                 case Type::STRING:
                     this->type = TokenType::STRING;
+                    break;
+                case Type::BOOL:
+                    this->type = TokenType::BOOL;
                     break;
             }
             this->token = value.GetString();

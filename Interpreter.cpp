@@ -12,6 +12,9 @@ namespace pLang {
         {   "float",    TokenType::TYPE         },
         {   "double",   TokenType::TYPE         },
         {   "string",   TokenType::TYPE         },
+        {   "bool",     TokenType::TYPE         },
+        {   "true",     TokenType::BOOL         },
+        {   "false",    TokenType::BOOL         },
         {   "=",        TokenType::EQUAL        },
         {   "+",        TokenType::ADD          },
         {   "-",        TokenType::SUB          },
@@ -33,7 +36,8 @@ namespace pLang {
         {   "int",      Type::INT               },
         {   "float",    Type::FLOAT             },
         {   "double",   Type::DOUBLE            },
-        {   "string",   Type::STRING            }
+        {   "string",   Type::STRING            },
+        {   "bool",     Type::BOOL              }
     };
 
     std::map<char, char> WRAPPER_MATCH = {
@@ -51,6 +55,10 @@ namespace pLang {
                 // Handle types
                 case TokenType::TYPE:
                     tokens.push_back(Token(TokenType::TYPE, token));
+                    break;
+
+                case TokenType::BOOL:
+                    tokens.push_back(Token(TokenType::BOOL, token));
                     break;
 
                 // Handle operators
@@ -198,7 +206,13 @@ namespace pLang {
                             ParseMiscToken(currToken, tokens);
 
                             if (tokens.size() > 0) {
-                                this->ParseLine(tokens, global);
+                                try {
+                                    this->ParseLine(tokens, global);
+                                }
+                                catch (const std::exception &e) {
+                                    std::printf("\033[1m\033[30m%s\033[0m\n", e.what());
+                                    exit(EXIT_FAILURE);
+                                }
                                 tokens.clear();
                             }
 
@@ -244,6 +258,9 @@ namespace pLang {
                     scope.AddVariable(tokens[1].token, Value((std::string)""));
                     tokens.erase(tokens.begin());
                     break;
+                case Type::BOOL:
+                    scope.AddVariable(tokens[1].token, Value((bool)false));
+                    tokens.erase(tokens.begin());
             }
         }
 

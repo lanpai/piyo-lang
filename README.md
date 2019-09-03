@@ -16,16 +16,16 @@ piyo language interpreter
 - v. **alpha**
   - [x] scope
   - [ ] standard library
-    - [ ] print
+    - [ ] print (currently implemented crudely)
   - [ ] for
   - [ ] if
   - [ ] while
-  - [ ] primitives
+  - [x] primitives
     - [x] int
     - [x] float
     - [x] double
     - [x] string
-    - [ ] bool
+    - [x] bool
     
 ---
 

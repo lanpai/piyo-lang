@@ -1,14 +1,4 @@
-int a = 5;
-int b;
-b = a + 1;
+int a = 20;
 print(a);
-print(b);
-
-string test = "a" + "b" + 5;
-print(test);
-
-int mod = 5 % 3;
-print(mod);
-
-bool boolean = false + false;
-print(boolean);
+a = 5 + 9 / 3;
+print(a);

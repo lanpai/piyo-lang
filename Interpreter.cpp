@@ -169,6 +169,17 @@ namespace pLang {
                                 break;
                             }
 
+                            // Check if /=
+                            if (content.length() - 1 > i && content[i + 1] == '=') {
+                                tokens.push_back(Token(TokenType::DIV_EQUAL, std::string(1, c)));
+                                ss.get(c);
+                                i += 1;
+                                break;
+                            }
+
+                            tokens.push_back(Token(TokenType::DIV, currToken));
+                            currToken.clear();
+
                             break;
 
                         case '"':
@@ -356,6 +367,26 @@ namespace pLang {
                     throw std::logic_error("expected left hand side of operator '=' to be an identifier");
                 lhs.GetValue(&scope).SetValue(rhs.GetValue(&scope));
                 return lhs;
+
+            case TokenType::ADD_EQUAL:
+                return lhs.GetValue(&scope) += rhs.GetValue(&scope);
+                break;
+
+            case TokenType::SUB_EQUAL:
+                return lhs.GetValue(&scope) -= rhs.GetValue(&scope);
+                break;
+
+            case TokenType::MULT_EQUAL:
+                return lhs.GetValue(&scope) *= rhs.GetValue(&scope);
+                break;
+
+            case TokenType::DIV_EQUAL:
+                return lhs.GetValue(&scope) /= rhs.GetValue(&scope);
+                break;
+
+            case TokenType::MOD_EQUAL:
+                return lhs.GetValue(&scope) %= rhs.GetValue(&scope);
+                break;
 
             case TokenType::ADD:
                 return Token(lhs.GetValue(&scope) + rhs.GetValue(&scope));

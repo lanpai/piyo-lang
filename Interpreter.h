@@ -43,6 +43,9 @@ namespace pLang {
         IS_G_EQUAL,
         IS_L_EQUAL,
 
+        AND,
+        OR,
+
         // MISC
         WRAPPER,
         TERMINATOR
@@ -141,7 +144,7 @@ namespace pLang {
             Interpreter();
 
             void Parse(const std::string &content);
-            void ParseLine(std::vector<Token> &tokens, Scope &scope);
+            void ParseTokens(std::vector<Token> &tokens, Scope &scope);
 
             Token HandleOperator(TokenType oper, Token &lhs, Token &rhs, Scope &scope);
     };

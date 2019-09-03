@@ -55,6 +55,17 @@ namespace pLang {
             Value operator/=(const Value &rhs);
             Value operator%=(const Value &rhs);
 
+            bool operator==(const Value &rhs) const;
+            bool operator!=(const Value &rhs) const;
+
+            Value operator>(const Value &rhs) const;
+            Value operator<(const Value &rhs) const;
+            Value operator>=(const Value &rhs) const;
+            Value operator<=(const Value &rhs) const;
+
+            Value operator&&(const Value &rhs) const;
+            Value operator||(const Value &rhs) const;
+
         private:
             Type type;
 

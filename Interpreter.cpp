@@ -37,6 +37,8 @@ namespace pLang {
         {   "<",        TokenType::IS_LESSER    },
         {   ">=",       TokenType::IS_G_EQUAL   },
         {   "<=",       TokenType::IS_L_EQUAL   },
+        {   "&&",       TokenType::AND          },
+        {   "||",       TokenType::OR           }
     };
 
     std::map<std::string, Type> TO_TYPE = {
@@ -182,17 +184,33 @@ namespace pLang {
                             ParseMiscToken(currToken, tokens);
                             currToken.clear();
 
-                            // Check if /=
+                            // Check if operator-=
                             if (content.length() - 1 > i && content[i + 1] == '=') {
-                                tokens.push_back(Token(TOKEN_IDENTIFIER[std::string(1, c) + "="], std::string(1, c)));
-                                std::printf("FOUND %s\n", (std::string(1, c) + "=").c_str());
+                                std::string token = std::string(1, c) + "=";
+                                tokens.push_back(Token(TOKEN_IDENTIFIER[token], token));
                                 ss.get(c);
                                 i += 1;
                                 break;
                             }
 
                             tokens.push_back(Token(TOKEN_IDENTIFIER[std::string(1, c)], std::string(1, c)));
-                            std::printf("FOUND %c\n", c);
+                            break;
+
+                        case '&':
+                        case '|':
+                            ParseMiscToken(currToken, tokens);
+                            currToken.clear();
+
+                            // Check if && or ||
+                            if (content.length() - 1 > i && content[i + 1] == c) {
+                                std::string token = std::string(1, c) + std::string(1, c);
+                                tokens.push_back(Token(TOKEN_IDENTIFIER[token], token));
+                                ss.get(c);
+                                i += 1;
+                                break;
+                            }
+
+                            tokens.push_back(Token(TOKEN_IDENTIFIER[std::string(1, c)], std::string(1, c)));
                             break;
 
                         case '"':
@@ -231,7 +249,7 @@ namespace pLang {
 
                             if (tokens.size() > 0) {
                                 try {
-                                    this->ParseLine(tokens, global);
+                                    this->ParseTokens(tokens, global);
                                 }
                                 catch (const std::exception &e) {
                                     std::printf("\033[1m\033[30m%s\033[0m\n", e.what());
@@ -255,10 +273,8 @@ namespace pLang {
     }
 
     void
-    Interpreter::ParseLine(std::vector<Token> &tokens, Scope &scope) {
+    Interpreter::ParseTokens(std::vector<Token> &tokens, Scope &scope) {
         // Precedence
-        
-        int operators = 0;
 
         // Variable declarations
         if (tokens[0].type == TokenType::TYPE) {
@@ -342,9 +358,46 @@ namespace pLang {
         }
 
         // > < >= <=
+        for (int i = 0; i < tokens.size(); i++) {
+            switch (tokens[i].type) {
+                case TokenType::IS_GREATER:
+                case TokenType::IS_LESSER:
+                case TokenType::IS_G_EQUAL:
+                case TokenType::IS_L_EQUAL:
+                    if (i == 0)
+                        throw std::logic_error("expected token before operator");
+                    if (tokens.size() - 1 <= i)
+                        throw std::logic_error("expected token after operator");
+
+                    tokens[i - 1] = this->HandleOperator(tokens[i].type, tokens[i - 1], tokens[i + 1], scope);
+                    tokens.erase(tokens.begin() + i, tokens.begin() + i + 2);
+
+                    i--;
+                    break;
+                default:
+                    break;
+            }
+        }
 
         // == !=
-        operators = 0;
+        for (int i = 0; i < tokens.size(); i++) {
+            switch (tokens[i].type) {
+                case TokenType::IS_EQUAL:
+                case TokenType::IS_NOT_EQUAL:
+                    if (i == 0)
+                        throw std::logic_error("expected token before operator");
+                    if (tokens.size() - 1 <= i)
+                        throw std::logic_error("expected token after operator");
+
+                    tokens[i - 1] = this->HandleOperator(tokens[i].type, tokens[i - 1], tokens[i + 1], scope);
+                    tokens.erase(tokens.begin() + i, tokens.begin() + i + 2);
+
+                    i--;
+                    break;
+                default:
+                    break;
+            }
+        }
 
         // = += -= *= /= %=
         for (int i = tokens.size() - 1; i >= 0; i--) {
@@ -381,26 +434,6 @@ namespace pLang {
                 lhs.GetValue(&scope).SetValue(rhs.GetValue(&scope));
                 return lhs;
 
-            case TokenType::ADD_EQUAL:
-                return lhs.GetValue(&scope) += rhs.GetValue(&scope);
-                break;
-
-            case TokenType::SUB_EQUAL:
-                return lhs.GetValue(&scope) -= rhs.GetValue(&scope);
-                break;
-
-            case TokenType::MULT_EQUAL:
-                return lhs.GetValue(&scope) *= rhs.GetValue(&scope);
-                break;
-
-            case TokenType::DIV_EQUAL:
-                return lhs.GetValue(&scope) /= rhs.GetValue(&scope);
-                break;
-
-            case TokenType::MOD_EQUAL:
-                return lhs.GetValue(&scope) %= rhs.GetValue(&scope);
-                break;
-
             case TokenType::ADD:
                 return Token(lhs.GetValue(&scope) + rhs.GetValue(&scope));
 
@@ -415,6 +448,45 @@ namespace pLang {
 
             case TokenType::MOD:
                 return Token(lhs.GetValue(&scope) % rhs.GetValue(&scope));
+
+            case TokenType::ADD_EQUAL:
+                return lhs.GetValue(&scope) += rhs.GetValue(&scope);
+
+            case TokenType::SUB_EQUAL:
+                return lhs.GetValue(&scope) -= rhs.GetValue(&scope);
+
+            case TokenType::MULT_EQUAL:
+                return lhs.GetValue(&scope) *= rhs.GetValue(&scope);
+
+            case TokenType::DIV_EQUAL:
+                return lhs.GetValue(&scope) /= rhs.GetValue(&scope);
+
+            case TokenType::MOD_EQUAL:
+                return lhs.GetValue(&scope) %= rhs.GetValue(&scope);
+
+            case TokenType::IS_EQUAL:
+                return Token(lhs.GetValue(&scope) == rhs.GetValue(&scope));
+
+            case TokenType::IS_NOT_EQUAL:
+                return Token(lhs.GetValue(&scope) != rhs.GetValue(&scope));
+
+            case TokenType::IS_GREATER:
+                return lhs.GetValue(&scope) > rhs.GetValue(&scope);
+
+            case TokenType::IS_LESSER:
+                return lhs.GetValue(&scope) < rhs.GetValue(&scope);
+
+            case TokenType::IS_G_EQUAL:
+                return lhs.GetValue(&scope) >= rhs.GetValue(&scope);
+
+            case TokenType::IS_L_EQUAL:
+                return lhs.GetValue(&scope) <= rhs.GetValue(&scope);
+
+            case TokenType::AND:
+                return lhs.GetValue(&scope) && rhs.GetValue(&scope);
+
+            case TokenType::OR:
+                return lhs.GetValue(&scope) || rhs.GetValue(&scope);
 
             default:
                 throw std::logic_error("illegal operator");

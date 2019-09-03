@@ -630,4 +630,455 @@ namespace pLang {
         return *this;
     }
 
+    bool
+    Value::operator==(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() == rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() == rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() == rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetInt() == rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() == rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() == rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() == rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetFloat() == rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() == rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() == rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() == rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetDouble() == rhs.GetBool();
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::STRING:
+                        return this->GetString() == rhs.GetString();
+                    default:
+                        return false;
+                }
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() == rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() == rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() == rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetBool() == rhs.GetBool();
+                }
+        }
+    }
+
+    bool
+    Value::operator!=(const Value &rhs) const {
+        return !(*this == rhs);
+    }
+
+    Value
+    Value::operator>(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() > rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() > rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() > rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetInt() > rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() > rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() > rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() > rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetFloat() > rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() > rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() > rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() > rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetDouble() > rhs.GetBool();
+                }
+            case Type::STRING:
+                return false;
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() > rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() > rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() > rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetBool() > rhs.GetBool();
+                }
+        }
+    }
+
+    Value
+    Value::operator<(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() < rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() < rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() < rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetInt() < rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() < rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() < rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() < rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetFloat() < rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() < rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() < rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() < rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetDouble() < rhs.GetBool();
+                }
+            case Type::STRING:
+                return false;
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() < rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() < rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() < rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetBool() < rhs.GetBool();
+                }
+        }
+    }
+
+    Value
+    Value::operator>=(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() >= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() >= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() >= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetInt() >= rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() >= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() >= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() >= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetFloat() >= rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() >= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() >= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() >= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetDouble() >= rhs.GetBool();
+                }
+            case Type::STRING:
+                return false;
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() >= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() >= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() >= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetBool() >= rhs.GetBool();
+                }
+        }
+    }
+
+    Value
+    Value::operator<=(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() <= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() <= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() <= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetInt() <= rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() <= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() <= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() <= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetFloat() <= rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() <= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() <= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() <= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetDouble() <= rhs.GetBool();
+                }
+            case Type::STRING:
+                return false;
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() <= rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() <= rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() <= rhs.GetDouble();
+                    case Type::STRING:
+                        return false;
+                    case Type::BOOL:
+                        return this->GetBool() <= rhs.GetBool();
+                }
+        }
+    }
+
+    Value
+    Value::operator&&(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() && rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() && rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() && rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetInt() && rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetInt() && rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() && rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() && rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() && rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetFloat() && rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetFloat() && rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() && rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() && rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() && rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetDouble() && rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetDouble() && rhs.GetBool();
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() && rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() && rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() && rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetBool() && rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetBool() && rhs.GetBool();
+                }
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() && rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() && rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() && rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetBool() && rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetBool() && rhs.GetBool();
+                }
+        }
+    }
+
+    Value
+    Value::operator||(const Value &rhs) const {
+        switch (this->type) {
+            case Type::INT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetInt() || rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetInt() || rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetInt() || rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetInt() || rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetInt() || rhs.GetBool();
+                }
+            case Type::FLOAT:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetFloat() || rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetFloat() || rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetFloat() || rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetFloat() || rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetFloat() || rhs.GetBool();
+                }
+            case Type::DOUBLE:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetDouble() || rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetDouble() || rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetDouble() || rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetDouble() || rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetDouble() || rhs.GetBool();
+                }
+            case Type::STRING:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() || rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() || rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() || rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetBool() || rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetBool() || rhs.GetBool();
+                }
+            case Type::BOOL:
+                switch (rhs.type) {
+                    case Type::INT:
+                        return this->GetBool() || rhs.GetInt();
+                    case Type::FLOAT:
+                        return this->GetBool() || rhs.GetFloat();
+                    case Type::DOUBLE:
+                        return this->GetBool() || rhs.GetDouble();
+                    case Type::STRING:
+                        return this->GetBool() || rhs.GetBool();
+                    case Type::BOOL:
+                        return this->GetBool() || rhs.GetBool();
+                }
+        }
+    }
 }

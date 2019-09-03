@@ -26,10 +26,17 @@ namespace pLang {
         {   "*=",       TokenType::MULT_EQUAL   },
         {   "/=",       TokenType::DIV_EQUAL    },
         {   "%=",       TokenType::MOD_EQUAL    },
+        {   "!",        TokenType::NOT          },
         {   "\"",       TokenType::WRAPPER      },
         {   "(",        TokenType::WRAPPER      },
         {   ")",        TokenType::WRAPPER      },
-        {   ";",        TokenType::TERMINATOR   }
+        {   ";",        TokenType::TERMINATOR   },
+        {   "==",       TokenType::IS_EQUAL     },
+        {   "!=",       TokenType::IS_NOT_EQUAL },
+        {   ">",        TokenType::IS_GREATER   },
+        {   "<",        TokenType::IS_LESSER    },
+        {   ">=",       TokenType::IS_G_EQUAL   },
+        {   "<=",       TokenType::IS_L_EQUAL   },
     };
 
     std::map<std::string, Type> TO_TYPE = {
@@ -59,21 +66,6 @@ namespace pLang {
 
                 case TokenType::BOOL:
                     tokens.push_back(Token(TokenType::BOOL, token));
-                    break;
-
-                // Handle operators
-                case TokenType::EQUAL:
-                case TokenType::ADD:
-                case TokenType::SUB:
-                case TokenType::MULT:
-                case TokenType::DIV:
-                case TokenType::MOD:
-                case TokenType::ADD_EQUAL:
-                case TokenType::SUB_EQUAL:
-                case TokenType::MULT_EQUAL:
-                case TokenType::DIV_EQUAL:
-                case TokenType::MOD_EQUAL:
-                    tokens.push_back(Token(TOKEN_IDENTIFIER[token], token));
                     break;
 
                 default:
@@ -151,10 +143,9 @@ namespace pLang {
                     // Check current character
                     switch (c) {
                         case '/':
-                            ParseMiscToken(currToken, tokens);
-
                             // Enable LINE_COMMENT state on //
                             if (content.length() - 1 > i && content[i + 1] == '/') {
+                                ParseMiscToken(currToken, tokens);
                                 currState = ReadState::LINE_COMMENT;
                                 ss.get(c);
                                 i += 1;
@@ -163,6 +154,7 @@ namespace pLang {
 
                             // Enable BLOCK_COMMENT state on /*
                             if (content.length() - 1 > i && content[i + 1] == '*') {
+                                ParseMiscToken(currToken, tokens);
                                 currState = ReadState::BLOCK_COMMENT;
                                 ss.get(c);
                                 i += 1;
@@ -171,15 +163,36 @@ namespace pLang {
 
                             // Check if /=
                             if (content.length() - 1 > i && content[i + 1] == '=') {
+                                ParseMiscToken(currToken, tokens);
                                 tokens.push_back(Token(TokenType::DIV_EQUAL, std::string(1, c)));
                                 ss.get(c);
                                 i += 1;
                                 break;
                             }
 
-                            tokens.push_back(Token(TokenType::DIV, currToken));
+                        // Handle operators
+                        case '=':
+                        case '>':
+                        case '<':
+                        case '!':
+                        case '+':
+                        case '-':
+                        case '*':
+                        case '%':
+                            ParseMiscToken(currToken, tokens);
                             currToken.clear();
 
+                            // Check if /=
+                            if (content.length() - 1 > i && content[i + 1] == '=') {
+                                tokens.push_back(Token(TOKEN_IDENTIFIER[std::string(1, c) + "="], std::string(1, c)));
+                                std::printf("FOUND %s\n", (std::string(1, c) + "=").c_str());
+                                ss.get(c);
+                                i += 1;
+                                break;
+                            }
+
+                            tokens.push_back(Token(TOKEN_IDENTIFIER[std::string(1, c)], std::string(1, c)));
+                            std::printf("FOUND %c\n", c);
                             break;
 
                         case '"':

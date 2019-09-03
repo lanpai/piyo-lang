@@ -33,6 +33,15 @@ namespace pLang {
         MULT_EQUAL,
         DIV_EQUAL,
         MOD_EQUAL,
+        NOT,
+
+        // COMPARATIVES
+        IS_EQUAL,
+        IS_NOT_EQUAL,
+        IS_GREATER,
+        IS_LESSER,
+        IS_G_EQUAL,
+        IS_L_EQUAL,
 
         // MISC
         WRAPPER,

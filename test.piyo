@@ -1,6 +1,6 @@
 int a = 4;
 int b = 4;
-bool c = a == b;
+bool c = a >= b;
 
 
 print(c);

@@ -8,12 +8,18 @@
 using namespace pLang;
 
 int main(int argc, char** argv) {
-    std::ifstream fs("test.piyo");
-    std::string content((std::istreambuf_iterator<char>(fs)),
-                       (std::istreambuf_iterator<char>()));
+    if (argc > 1) {
+        std::ifstream fs(argv[1]);
 
-    Interpreter pLang;
-    pLang.Parse(content);
+        std::string content((std::istreambuf_iterator<char>(fs)),
+                           (std::istreambuf_iterator<char>()));
+
+        Interpreter pLang;
+        pLang.Parse(content);
+    }
+    else {
+        std::printf("no file provided in argument!\n");
+    }
 
     return 0;
 }

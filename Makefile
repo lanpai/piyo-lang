@@ -1,4 +1,4 @@
-BINARY = piyo-lang
+BINARY = piyo
 
 CPP_STD=c++17
 
@@ -34,7 +34,7 @@ Scope.o: Scope.cpp
 	cd $(OBJ_DIR); $(CXX) -Wall -std=$(CPP_STD) -c ../Scope.cpp
 
 run:
-	$(RUN_PREFIX) $(BUILD_DIR)/$(BINARY)
+	$(RUN_PREFIX) $(BUILD_DIR)/$(BINARY) test.piyo
 
 clean:
 	rm -rf $(OBJ_DIR) $(BUILD_DIR)
